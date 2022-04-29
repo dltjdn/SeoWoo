@@ -22,6 +22,10 @@ const BlogSchema = new mongoose.Schema({
     },
     tag: {
         type: String
+    },
+    date:{
+        type: Date,
+        default: Date.now
     }
 
 });
