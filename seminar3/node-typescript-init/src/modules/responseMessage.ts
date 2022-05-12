@@ -11,11 +11,11 @@ const message = {
     UPDATE_USER_SUCCESS: '유저 수정 성공',
 
     //블로그 조회
-    // 유저 조회
     READ_BLOG_SUCCESS: '블로그 글 조회 성공',
     CREATE_BLOG_SUCCESS: '블로그 글 생성 성공',
     DELETE_BLOG_SUCCESS: '블로그 글 삭제 성공',
-    UPDATE_BLOG_SUCCESS: '블로그 글 수정 성공'
+    UPDATE_BLOG_SUCCESS: '블로그 글 수정 성공',
+
 }
 
 export default message;
