@@ -40,9 +40,9 @@ const updateMovie = async(movieId: string, movieUpdateDto: MovieUpdateDto) => {
     }
 }
 
-const findMovieById = async (movieId: string):Promise<MovieResponseDto | null> => {
+const findMovieById = async (movieId: string):Promise<MovieResponseDto| null> => {
     try{
-        const movie = await Movie.findById(movieId);
+        const movie= await Movie.findById(movieId);
         if(!movie){
             return null;
         }

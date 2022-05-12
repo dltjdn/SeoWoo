@@ -36,9 +36,11 @@ const createMovie = async(req: Request, res: Response) => {
  * @access Public
 */
  const findMovieById = async (req:Request, res:Response) => {
-    const {MovieId} = req.params;
+    const { movieId } = req.params;
+
     try{
-        const data = await MovieService.findMovieById(MovieId);
+        const data = await MovieService.findMovieById(movieId);
+
         if(!data){
             return res.status(statusCode.NOT_FOUND).send(util.fail(statusCode.NOT_FOUND, message.NOT_FOUND));
         }

@@ -1,6 +1,6 @@
 import {Router} from "express";
 import ReviewController from "../controllers/ReviewController"
-import { body } from "express-validator/check";
+const { body } = require("express-validator/check");
 
 const router: Router = Router();
 
