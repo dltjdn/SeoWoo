@@ -9,7 +9,7 @@
 |`1주차`| Javascript, Typescript, Node.js 기초 | ⭕ | ⭕ |
 |`2주차`| Express, HTTP, REST API, MVC 개념 | ⭕ | ⭕ |
 |`3주차`| NoSQL, MongoDB 설계, Mongoose ODM, DTO |⭕  |⭕ |
-|`4주차`| AWS EC2와 PM2를 사용한 무중단 배포, S3 사용법 |  | |
+|`4주차`| AWS EC2와 PM2를 사용한 무중단 배포, S3 사용법 |⭕ | ⭕ |
 |`5주차`| 실전 API 설계 및 명세서 작성 1, JWT 유저 인증 |  |  |
 |`6주차`| 클라이언트 & 서버 합동 세미나 + 솝커톤 |  |  |
 |`7주차`| 실전 API 설계 및 명세서 작성 2 |  | |
