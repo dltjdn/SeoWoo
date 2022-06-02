@@ -1,10 +1,13 @@
 import { PostBaseResponseDto } from "../interfaces/common/PostBaseResponseDto";
-import {ReviewCreateDto} from "../interfaces/review/ReviewCreateDto";
+import { ReviewCreateDto } from "../interfaces/review/ReviewCreateDto";
+import { ReviewInfo } from "../interfaces/review/ReviewInfo";
 import { ReviewResponseDto } from "../interfaces/review/ReviewResponseDto";
+import { ReviewsResponseDto } from "../interfaces/review/ReviewsResponseDto";
 import Review from "../models/Review";
+import { ReviewOptionType } from "../interfaces/review/ReviewOptionType";
 
 const createReview = async (movieId: string, reviewCreateDto: ReviewCreateDto): Promise<PostBaseResponseDto> => {
-    try{
+    try {
         const review = new Review({
             title: reviewCreateDto.title,
             content: reviewCreateDto.content,
@@ -19,39 +22,69 @@ const createReview = async (movieId: string, reviewCreateDto: ReviewCreateDto): 
         };
 
         return data;
-    } catch(error){
-        console.log(error);
-        throw error;
-    }
-} 
-
-const getReviews = async(movieId: string): Promise<ReviewResponseDto[]> => {
-    try{
-        const reviews = await Review.find({
-            movie: movieId
-        }).populate('writer','name').populate('movie');
-
-        // await Model.find().populate(path, select) 
-        // select => 특정 필드만 선택 가능
-
-        const data = await Promise.all(reviews.map((review: any) => {
-            const result = {
-                writer: review.writer.name,
-                movie: review.movie,
-                title: review.title,
-                content: review.content
-            };
-            return result;
-        }));
-
-        return data;
-    }catch(error){
+    } catch (error) {
         console.log(error);
         throw error;
     }
 }
 
-export default{
+const getReviews = async (movieId: string, search: string, option: ReviewOptionType, page: number): Promise<ReviewsResponseDto> => {
+
+    const regex = (pattern: string) => new RegExp(`.*${pattern}.*`);
+
+    let reviews: ReviewInfo[] = [];
+    const perPage: number = 2;
+
+    try {
+
+        const pattern: RegExp = regex(search);
+
+        if (option === 'title') {
+            reviews = await Review.find({ title: { $regex: pattern } })
+                .where('movie').equals(movieId)
+                .populate(['movie', 'writer'])
+                .sort({ createdAt: -1 })
+                .skip(perPage * (page - 1))
+                .limit(perPage);
+
+        } else if (option === 'content') {
+            reviews = await Review.find({ content: { $regex: pattern } })
+                .where('movie').equals(movieId)
+                .sort({ createdAt: -1 })
+                .skip(perPage * (page - 1))
+                .limit(perPage);
+
+
+        } else {
+            reviews = await Review.find({
+                $or: [
+                    { title: { $regex: pattern } },
+                    { content: { $regex: pattern } }
+                ]
+            })
+                .where('movie').equals(movieId)
+                .sort({ createdAt: -1 })
+                .skip(perPage * (page - 1))
+                .limit(perPage);
+        }
+
+        const total: number = await Review.countDocuments({ movie: movieId });
+        const lastPage: number = Math.ceil(total / perPage);
+
+        const data = {
+            reviews,
+            lastPage
+        };
+
+        return data;
+
+    } catch (error) {
+        console.log(error);
+        throw error;
+    }
+}
+
+export default {
     createReview,
     getReviews
 
