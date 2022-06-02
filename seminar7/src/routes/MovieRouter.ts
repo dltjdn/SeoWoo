@@ -7,6 +7,8 @@ import Movie from '../models/Movie';
 
 const router: Router = Router();
 
+router.get('/', MovieController.getMovieBySearch);
+
 router.post('/', [
     body('title').notEmpty(),
     body('director').notEmpty()
@@ -19,7 +21,10 @@ router.post('/:movieId/comment', [
 ], MovieController.createMovieComment);
 
 router.get('/:movieId', MovieController.getMovie);
+
 router.put('/:movieId/comments/:commentId', [
     body('comment').notEmpty()
 ], auth, MovieController.updateMovieComment)
+
+
 export default router;
