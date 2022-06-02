@@ -111,7 +111,7 @@ const updateMovieComment = async (req: Request, res: Response) => {
 }
 
 /**
- * @route GET /movie?search=&?option=
+ * @route GET /movie?search=&?option=?page=
  * @desc GET Movie By Search
  * @access Public
  */
@@ -126,8 +126,10 @@ const getMovieBySearch = async (req: Request, res: Response) => {
         return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, message.NULL_VALUE));
     }
 
+    const page: number = Number(req.query.page || 1);
+
     try {
-        const data = await MovieService.getMovieBySearch(search as string, option as MovieOptionType);
+        const data = await MovieService.getMovieBySearch(search as string, option as MovieOptionType, page);
 
         res.status(statusCode.OK).send(util.success(statusCode.OK, message.SEARCH_MOVIE_SUCCESS, data));
     } catch (error) {
