@@ -28,41 +28,50 @@ const createReview = async (movieId: string, reviewCreateDto: ReviewCreateDto): 
     }
 }
 
-const getReviews = async (movieId: string, search: string, option: ReviewOptionType, page: number): Promise<ReviewsResponseDto> => {
+const getReviews = async (movieId: string, page: number, search?: string, option?: ReviewOptionType): Promise<ReviewsResponseDto> => {
 
-    const regex = (pattern: string) => new RegExp(`.*${pattern}.*`);
+
 
     let reviews: ReviewInfo[] = [];
     const perPage: number = 2;
 
     try {
+        if (search && option) {
+            const regex = (pattern: string) => new RegExp(`.*${pattern}.*`);
 
-        const pattern: RegExp = regex(search);
+            const pattern: RegExp = regex(search);
 
-        if (option === 'title') {
-            reviews = await Review.find({ title: { $regex: pattern } })
+            if (option === 'title') {
+                reviews = await Review.find({ title: { $regex: pattern } })
+                    .where('movie').equals(movieId)
+                    .populate(['movie', 'writer'])
+                    .sort({ createdAt: -1 })
+                    .skip(perPage * (page - 1))
+                    .limit(perPage);
+            } else if (option === 'content') {
+                reviews = await Review.find({ content: { $regex: pattern } })
+                    .where('movie').equals(movieId)
+                    .populate(['movie', 'writer'])
+                    .sort({ createdAt: -1 })
+                    .skip(perPage * (page - 1))
+                    .limit(perPage);
+            } else {
+                reviews = await Review.find({
+                    $or: [
+                        { title: { $regex: pattern } },
+                        { content: { $regex: pattern } }
+                    ]
+                })
+                    .where('movie').equals(movieId)
+                    .populate(['movie', 'writer'])
+                    .sort({ createdAt: -1 })
+                    .skip(perPage * (page - 1))
+                    .limit(perPage);
+            }
+        } else {
+            reviews = await Review.find()
                 .where('movie').equals(movieId)
                 .populate(['movie', 'writer'])
-                .sort({ createdAt: -1 })
-                .skip(perPage * (page - 1))
-                .limit(perPage);
-
-        } else if (option === 'content') {
-            reviews = await Review.find({ content: { $regex: pattern } })
-                .where('movie').equals(movieId)
-                .sort({ createdAt: -1 })
-                .skip(perPage * (page - 1))
-                .limit(perPage);
-
-
-        } else {
-            reviews = await Review.find({
-                $or: [
-                    { title: { $regex: pattern } },
-                    { content: { $regex: pattern } }
-                ]
-            })
-                .where('movie').equals(movieId)
                 .sort({ createdAt: -1 })
                 .skip(perPage * (page - 1))
                 .limit(perPage);
@@ -70,12 +79,10 @@ const getReviews = async (movieId: string, search: string, option: ReviewOptionT
 
         const total: number = await Review.countDocuments({ movie: movieId });
         const lastPage: number = Math.ceil(total / perPage);
-
         const data = {
             reviews,
             lastPage
         };
-
         return data;
 
     } catch (error) {

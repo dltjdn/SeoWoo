@@ -118,7 +118,7 @@ const getMovieBySearch = async (page: number, search?: string, option?: MovieOpt
                     .limit(perPage);
             }
         } else {
-            movies = await Movie.find({})
+            movies = await Movie.find()
                 .sort({ createdAt: -1 })
                 .skip(perPage * (page - 1))
                 .limit(perPage);

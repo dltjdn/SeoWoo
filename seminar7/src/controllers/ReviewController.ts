@@ -38,27 +38,35 @@ const createReview = async (req: Request, res: Response) => {
  */
 const getReviews = async (req: Request, res: Response) => {
     const { movieId } = req.params;
-
-    const { search, option } = req.query;
-
-    const isOptionType = (option: string): option is ReviewOptionType => {
-        return ["title", "content", "title_content"].indexOf(option) !== -1;
-    }
-
-    if (!isOptionType(option as string)) {
-        return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, message.NULL_VALUE));
-    }
-
     const page: number = Number(req.query.page || 1);
 
-    try {
-        const data = await ReviewService.getReviews(movieId, search as string, option as ReviewOptionType, page);
+    if (req.query.search && req.query.option) {
+        const { search, option } = req.query;
+        const isOptionType = (option: string): option is ReviewOptionType => {
+            return ["title", "content", "title_content"].indexOf(option) !== -1;
+        }
+        if (!isOptionType(option as string)) {
+            return res.status(statusCode.BAD_REQUEST).send(util.fail(statusCode.BAD_REQUEST, message.NULL_VALUE));
+        }
 
-        res.status(statusCode.OK).send(util.success(statusCode.OK, message.READ_REVIEW_SUCCESS, data));
-    } catch (error) {
-        console.log(error);
-        res.status(statusCode.INTERNAL_SERVER_ERROR).send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
+        try {
+            const data = await ReviewService.getReviews(movieId, page, search as string, option as ReviewOptionType);
+            res.status(statusCode.OK).send(util.success(statusCode.OK, message.READ_REVIEW_SUCCESS, data));
+        } catch (error) {
+            console.log(error);
+            res.status(statusCode.INTERNAL_SERVER_ERROR).send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
+        }
+
+    } else {
+        try {
+            const data = await ReviewService.getReviews(movieId, page);
+            res.status(statusCode.OK).send(util.success(statusCode.OK, message.READ_REVIEW_SUCCESS, data));
+        } catch (error) {
+            console.log(error);
+            res.status(statusCode.INTERNAL_SERVER_ERROR).send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR))
+        }
     }
+
 }
 
 export default {
